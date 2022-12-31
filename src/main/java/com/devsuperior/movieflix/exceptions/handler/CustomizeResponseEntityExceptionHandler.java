@@ -12,7 +12,10 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.devsuperior.movieflix.exceptions.DatabaseException;
 import com.devsuperior.movieflix.exceptions.ExceptionResponse;
+import com.devsuperior.movieflix.exceptions.ForbiddenException;
+import com.devsuperior.movieflix.exceptions.OAuthCustomErrorResponse;
 import com.devsuperior.movieflix.exceptions.ResourceNotFoundException;
+import com.devsuperior.movieflix.exceptions.UnauthorizedException;
 import com.devsuperior.movieflix.exceptions.ValidationExceptionResponse;
 
 @RestControllerAdvice
@@ -55,6 +58,24 @@ public class CustomizeResponseEntityExceptionHandler {
 			response.addError(error.getField(), error.getDefaultMessage());
 		}
 		
+		return ResponseEntity.status(status).body(response);
+	}
+	
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<OAuthCustomErrorResponse> handleUnhauthorizedException(UnauthorizedException e, WebRequest request) {
+		HttpStatus status = HttpStatus.UNAUTHORIZED;
+		OAuthCustomErrorResponse response = new OAuthCustomErrorResponse();
+		response.setError(UnauthorizedException.getError());
+		response.setErrorDescription(e.getMessage());
+		return ResponseEntity.status(status).body(response);
+	}
+	
+	@ExceptionHandler(ForbiddenException.class)
+	public ResponseEntity<OAuthCustomErrorResponse> handleForbiddenException(ForbiddenException e, WebRequest request) {
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		OAuthCustomErrorResponse response = new OAuthCustomErrorResponse();
+		response.setError(ForbiddenException.getError());
+		response.setErrorDescription(e.getMessage());
 		return ResponseEntity.status(status).body(response);
 	}
 }
